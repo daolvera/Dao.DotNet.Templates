@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Dao.Aspire.Mcp.ApiService/Dao.Aspire.Mcp.ApiService.csproj" />
+  <Project Path="Dao.Aspire.Mcp.AppHost/Dao.Aspire.Mcp.AppHost.csproj" />
+  <Project Path="Dao.Aspire.Mcp.ServiceDefaults/Dao.Aspire.Mcp.ServiceDefaults.csproj" />
+  <Project Path="Dao.Aspire.Mcp.Tests/Dao.Aspire.Mcp.Tests.csproj" />
+  <Project Path="Dao.Aspire.Mcp.Web/Dao.Aspire.Mcp.Web.csproj" />
+</Solution>
