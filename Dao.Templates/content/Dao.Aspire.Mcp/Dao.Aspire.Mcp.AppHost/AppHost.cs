@@ -7,6 +7,7 @@ var postgres = builder.AddPostgres("postgres").WithLifetime(ContainerLifetime.Pe
 var db = postgres.AddDatabase(ProjectNames.Database);
 
 var mcpServer = builder.AddProject<Projects.Dao_Aspire_Mcp_Server>(ProjectNames.McpServer)
+    .WithExternalHttpEndpoints()
     .WithReference(db)
     .WaitFor(db);
 
