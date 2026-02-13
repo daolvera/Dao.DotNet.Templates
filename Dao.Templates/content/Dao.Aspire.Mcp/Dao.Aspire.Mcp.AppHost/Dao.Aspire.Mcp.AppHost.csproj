@@ -1,4 +1,4 @@
-<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+﻿<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -9,8 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dao.Aspire.Mcp.ApiService\Dao.Aspire.Mcp.ApiService.csproj" />
-    <ProjectReference Include="..\Dao.Aspire.Mcp.Web\Dao.Aspire.Mcp.Web.csproj" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" Version="13.1.1" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.McpInspector" Version="13.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dao.Aspire.Mcp.Client\Dao.Aspire.Mcp.Client.csproj" />
+    <ProjectReference Include="..\Dao.Aspire.Mcp.Server\Dao.Aspire.Mcp.Server.csproj" />
+    <ProjectReference Include="..\Dao.Aspire.Mcp.Shared\Dao.Aspire.Mcp.Shared.csproj" IsAspireProjectResource="false" />
   </ItemGroup>
 
 </Project>

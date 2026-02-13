@@ -1,12 +1,19 @@
+using Dao.Aspire.Mcp.Shared;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
-var apiService = builder.AddProject<Projects.Dao_Aspire_Mcp_ApiService>("apiservice")
-    .WithHttpHealthCheck("/health");
+var postgres = builder.AddPostgres("postgres").WithLifetime(ContainerLifetime.Persistent);
 
-builder.AddProject<Projects.Dao_Aspire_Mcp_Web>("webfrontend")
+var db = postgres.AddDatabase(ProjectNames.Database);
+
+var mcpServer = builder.AddProject<Projects.Dao_Aspire_Mcp_Server>(ProjectNames.McpServer)
+    .WithReference(db)
+    .WaitFor(db);
+
+builder.AddProject<Projects.Dao_Aspire_Mcp_Client>(ProjectNames.McpClient)
     .WithExternalHttpEndpoints()
     .WithHttpHealthCheck("/health")
-    .WithReference(apiService)
-    .WaitFor(apiService);
+    .WithReference(mcpServer)
+    .WaitFor(mcpServer);
 
 builder.Build().Run();

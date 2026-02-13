@@ -1,0 +1,6 @@
+@Dao.Aspire.Mcp.Server_HostAddress = http://localhost:5083
+
+GET {{Dao.Aspire.Mcp.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

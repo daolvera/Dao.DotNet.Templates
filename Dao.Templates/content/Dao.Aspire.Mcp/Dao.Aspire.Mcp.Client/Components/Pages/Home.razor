@@ -1,0 +1,149 @@
+@page "/"
+
+@rendermode InteractiveServer
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+
+@using Dao.Aspire.Mcp.Client.Services
+@using Dao.Aspire.Mcp.Shared.Options
+@using Microsoft.Extensions.Options
+@using ModelContextProtocol
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Identity.Web
+@using System.Text.Json
+@using ModelContextProtocol.Client
+@using ModelContextProtocol.Protocol
+
+<PageTitle>MCP Tools Explorer</PageTitle>
+
+<h1>MCP Tools Explorer</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>Available Tools</h5>
+            </div>
+            <div class="card-body">
+                @if (isLoadingTools)
+                {
+                    <p><em>Loading tools...</em></p>
+                }
+                else if (tools.Count == 0)
+                {
+                    <button class="btn btn-primary" @onclick="() => LoadToolsAsync()">Load Tools</button>
+                    @if (!string.IsNullOrEmpty(errorMessage))
+                    {
+                        <div class="alert alert-danger mt-3">
+                            <strong>Error:</strong> @errorMessage
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="list-group">
+                        @foreach (var tool in tools)
+                        {
+                            <div class="list-group-item">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">@tool.Name</h6>
+                                </div>
+                                <small>@tool.Description</small>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject]
+    private McpClientService McpClientService { get; set; } = default!;
+    [Inject] private ILogger<Home> Logger { get; set; } = default!;
+    [Inject] private IOptions<AzureAdOptions> AzureAdOptions { get; set; } = default!;
+    [Inject] private ITokenAcquisition TokenAcquisition { get; set; } = default!;
+    [Inject] private NavigationManager NavigationManager { get; set; } = default!;
+    [Inject]
+    private Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage.ProtectedSessionStorage SessionStorage
+    {
+        get; set;
+    } = default!;
+
+    private McpClient? McpClient { get; set; } = null;
+    private IList<McpClientTool> tools { get; set; } = [];
+    private bool isLoadingTools { get; set; }
+    private string result { get; set; } = string.Empty;
+    private string errorMessage { get; set; } = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                // Check if we were loading tools before a redirect
+                var result = await SessionStorage.GetAsync<bool>("pendingLoadTools");
+                if (result.Success && result.Value)
+                {
+                    Logger.LogInformation("Resuming LoadTools after authentication redirect");
+                    await SessionStorage.DeleteAsync("pendingLoadTools");
+                    await LoadToolsAsync(isRetry: true);
+                    await SessionStorage.DeleteAsync("useApim");
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Failed to check for pending LoadTools operation");
+            }
+        }
+    }
+
+    protected async Task LoadToolsAsync(bool isRetry = false)
+    {
+        isLoadingTools = true;
+        errorMessage = "";
+        StateHasChanged();
+
+        try
+        {
+            Logger.LogInformation("Starting to load MCP tools...");
+            Logger.LogInformation("Acquiring access token for user...");
+            string token = await TokenAcquisition.GetAccessTokenForUserAsync(AzureAdOptions.Value.Scopes);
+            Logger.LogInformation("Access token acquired successfully");
+            Logger.LogInformation("Creating MCP client...");
+            McpClient ??= await McpClientService.CreateClientAsync(token);
+            Logger.LogInformation("MCP client created successfully");
+
+            Logger.LogInformation("Listing tools from MCP server...");
+            tools = await McpClient.ListToolsAsync();
+            Logger.LogInformation("Successfully loaded {ToolCount} tools from MCP server", tools.Count);
+        }
+        catch (Exception ex) when
+            (ex is Microsoft.Identity.Client.MsalUiRequiredException ||
+            ex is MicrosoftIdentityWebChallengeUserException)
+        {
+            Logger.LogWarning(ex, "User authentication required - redirecting to challenge");
+            // Mark that we need to retry loading tools after authentication
+            if (!isRetry)
+            {
+                await SessionStorage.SetAsync("pendingLoadTools", true);
+            }
+            // User needs to sign in or consent - redirect to login with challenge
+            var redirectUrl = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).ToString();
+            NavigationManager.NavigateTo($"MicrosoftIdentity/Account/Challenge?redirectUri={Uri.EscapeDataString(redirectUrl)}",
+            forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Failed to load MCP tools");
+            errorMessage = $"Failed to load tools: {ex.Message}";
+            StateHasChanged();
+        }
+        finally
+        {
+            isLoadingTools = false;
+            StateHasChanged();
+        }
+    }
+}

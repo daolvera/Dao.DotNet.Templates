@@ -1,7 +1,9 @@
 <Solution>
-  <Project Path="Dao.Aspire.Mcp.ApiService/Dao.Aspire.Mcp.ApiService.csproj" />
   <Project Path="Dao.Aspire.Mcp.AppHost/Dao.Aspire.Mcp.AppHost.csproj" />
+  <Project Path="Dao.Aspire.Mcp.Client/Dao.Aspire.Mcp.Client.csproj" />
+  <Project Path="Dao.Aspire.Mcp.Data/Dao.Aspire.Mcp.Data.csproj" Id="9be79612-9746-4409-8f56-73257ebfc520" />
+  <Project Path="Dao.Aspire.Mcp.Server/Dao.Aspire.Mcp.Server.csproj" />
   <Project Path="Dao.Aspire.Mcp.ServiceDefaults/Dao.Aspire.Mcp.ServiceDefaults.csproj" />
+  <Project Path="Dao.Aspire.Mcp.Shared/Dao.Aspire.Mcp.Shared.csproj" Id="5c2e8500-26f2-48f5-8303-b88d7b4280fc" />
   <Project Path="Dao.Aspire.Mcp.Tests/Dao.Aspire.Mcp.Tests.csproj" />
-  <Project Path="Dao.Aspire.Mcp.Web/Dao.Aspire.Mcp.Web.csproj" />
 </Solution>

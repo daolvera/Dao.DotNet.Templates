@@ -1,3 +1,4 @@
+using Dao.Aspire.Mcp.Shared;
 using Microsoft.Extensions.Logging;
 
 namespace Dao.Aspire.Mcp.Tests;
@@ -30,8 +31,8 @@ public class WebTests
         await app.StartAsync(cancellationToken).WaitAsync(DefaultTimeout, cancellationToken);
 
         // Act
-        var httpClient = app.CreateHttpClient("webfrontend");
-        await app.ResourceNotifications.WaitForResourceHealthyAsync("webfrontend", cancellationToken).WaitAsync(DefaultTimeout, cancellationToken);
+        var httpClient = app.CreateHttpClient(ProjectNames.McpClient);
+        await app.ResourceNotifications.WaitForResourceHealthyAsync(ProjectNames.McpClient, cancellationToken).WaitAsync(DefaultTimeout, cancellationToken);
         var response = await httpClient.GetAsync("/", cancellationToken);
 
         // Assert
