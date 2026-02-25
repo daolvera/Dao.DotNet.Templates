@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "DaoCodes",
+  "classifications": ["Web", "Aspire", "MCP", "AI"],
+  "identity": "Dao.Aspire.Mcp.Template",
+  "name": ".NET Aspire MCP Server and Client",
+  "shortName": "aspire-mcp",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "Dao.Aspire.Mcp",
+  "preferNameDirectory": true,
+  "symbols": {
+    "skipRestore": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "If specified, skips the automatic restore of the project on create.",
+      "defaultValue": "false"
+    },
+    "IncludeAuthentication": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Include Azure AD authentication for MCP Server and Client.",
+      "defaultValue": "true"
+    },
+    "IncludeWebClient": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Include Blazor Server web client with tool explorer UI.",
+      "defaultValue": "true"
+    },
+    "IncludeDatabase": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Include SQL Server and EF Core data layer.",
+      "defaultValue": "true"
+    },
+    "IncludeRoleBasedAuth": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Include role-based authorization (Admin, Developers, DataAnalyst policy).",
+      "defaultValue": "true"
+    },
+    "IncludeSampleData": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Seed database with sample users, products, and orders.",
+      "defaultValue": "true"
+    },
+    "IncludeMcpInspector": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Include MCP Inspector for testing tools during development.",
+      "defaultValue": "true"
+    },
+    "IncludeApplicationInsights": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Include Azure Application Insights for telemetry and monitoring.",
+      "defaultValue": "true"
+    },
+    "RequireAuthForRoles": {
+      "type": "computed",
+      "value": "(IncludeAuthentication && IncludeRoleBasedAuth)"
+    },
+    "RequireDbForSampleData": {
+      "type": "computed",
+      "value": "(IncludeDatabase && IncludeSampleData)"
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!IncludeWebClient)",
+          "exclude": ["Dao.Aspire.Mcp.Client/**", "Dao.Aspire.Mcp.Tests/**"]
+        },
+        {
+          "condition": "(!IncludeDatabase)",
+          "exclude": [
+            "Dao.Aspire.Mcp.Data/**",
+            "Dao.Aspire.Mcp.Server/Tools/SqlAnalyticsTools.cs"
+          ]
+        },
+        {
+          "condition": "(!IncludeAuthentication)",
+          "exclude": ["Dao.Aspire.Mcp.Server/Tools/AuthenticatedTool.cs"]
+        },
+        {
+          "condition": "(!RequireAuthForRoles)",
+          "exclude": ["Dao.Aspire.Mcp.Shared/Roles.cs"]
+        },
+        {
+          "exclude": [
+            "**/bin/**",
+            "**/obj/**",
+            "**/.vs/**",
+            "**/.vscode/**",
+            "**/.azure/**"
+          ]
+        }
+      ]
+    }
+  ],
+  "postActions": [
+    {
+      "condition": "(!skipRestore)",
+      "description": "Restore NuGet packages",
+      "manualInstructions": [
+        {
+          "text": "Run 'dotnet restore'"
+        }
+      ],
+      "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+      "continueOnError": true
+    }
+  ]
+}

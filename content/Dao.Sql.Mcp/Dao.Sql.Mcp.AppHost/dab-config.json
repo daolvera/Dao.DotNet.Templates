@@ -1,0 +1,257 @@
+{
+  // For more information on configuring your DAB instance, see https://learn.microsoft.com/en-us/azure/data-api-builder/configuration/
+  // For usage of the CLI tool to create and manage DAB projects, see https://learn.microsoft.com/en-us/azure/data-api-builder/command-line/
+  "$schema": "https://github.com/Azure/data-api-builder/releases/latest/download/dab.draft.schema.json",
+  "data-source": {
+    "database-type": "mssql",
+    "connection-string": "@env('MSSQL_CONNECTION_STRING')",
+    "options": {
+      "set-session-context": true
+    }
+  },
+  "runtime": {
+    "rest": {
+      "enabled": true,
+      "path": "/api"
+    },
+    "graphql": {
+      "enabled": false
+    },
+    "host": {
+      "cors": {
+        "origins": ["*"],
+        "allow-credentials": false
+      },
+      // For more information on authentication configuration, see https://learn.microsoft.com/en-us/azure/data-api-builder/concept/security/how-to-authenticate-entra
+      "authentication": {
+        "provider": "EntraID",
+        "jwt": {
+          "audience": "{{serverguid}}", // replace with Audience from app registration
+          "issuer": "https://login.microsoftonline.com/{{tenantId}}/v2.0" // replace with Tenant Id
+        }
+      }
+      //"mode": "development" // development mode enables features such as Swagger UI, increased logger verbosity, and health checks. Remove this setting or set to "production" for a production environment. For more information on runtime modes see
+      // https://learn.microsoft.com/en-us/azure/data-api-builder/configuration/runtime#mode-host-runtime
+    },
+    "mcp": {
+      "enabled": true,
+      "path": "/mcp",
+      "dml-tools": {
+        "describe-entities": true,
+        "create-record": true,
+        "read-records": true,
+        // deleting and updating are off by default, enable if needed utilizing role based permissions at the entity level
+        "update-record": false,
+        "delete-record": false,
+        "execute-entity": false // execute permissions allows users to run stored procedures or functions mapped as entities in the DAB config
+      }
+    }
+    // if configured, telemetry settings will enable application insights for monitoring and diagnostics. For more information see https://learn.microsoft.com/en-us/azure/data-api-builder/configuration/runtime#telemetry-runtime
+    //"telemetry": {
+    //	"application-insights": {
+    //		"enabled": true,
+    //		"connection-string": "@env('APPLICATIONINSIGHTS_CONNECTION_STRING')"
+    //	}
+    //}
+  },
+  // For more information on authentication configuration, see https://learn.microsoft.com/en-us/azure/data-api-builder/concept/security/how-to-authenticate-entra?tabs=bash#step-3-configure-entity-permissions
+  "entities": {
+    "User": {
+      "source": {
+        "object": "dbo.Users",
+        "type": "table"
+      },
+      "description": "Application user records with profile information",
+      "fields": [
+        {
+          "name": "Id",
+          "description": "Unique identifier for the user (auto-generated)",
+          "primary-key": true
+        },
+        {
+          "name": "Name",
+          "description": "Full name of the user",
+          "primary-key": false
+        },
+        {
+          "name": "Email",
+          "description": "User's email address (unique, used for authentication)",
+          "primary-key": false
+        },
+        {
+          "name": "Role",
+          "description": "User's role in the system (e.g., 'user', 'admin', 'manager')",
+          "primary-key": false
+        },
+        {
+          "name": "Active",
+          "description": "Account status flag (false indicates deactivated account)",
+          "primary-key": false
+        },
+        {
+          "name": "CreatedAt",
+          "description": "Account creation timestamp in UTC",
+          "primary-key": false
+        }
+      ],
+      "permissions": [
+        // Anonymous permissions are off by default, enable if needed. Be sure to only allow necessary actions for anonymous users to avoid unintended data exposure
+        //{
+        //	"role": "anonymous",
+        //	"actions": [ ]
+        //},
+        {
+          "role": "Developers",
+          "actions": ["*"]
+        }
+      ]
+    },
+    "Product": {
+      "source": {
+        "object": "dbo.Products",
+        "type": "table"
+      },
+      "description": "Product catalog with inventory and pricing information",
+      "fields": [
+        {
+          "name": "Id",
+          "description": "Unique identifier for the product (auto-generated)",
+          "primary-key": true
+        },
+        {
+          "name": "Name",
+          "description": "Display name of the product",
+          "primary-key": false
+        },
+        {
+          "name": "Description",
+          "description": "Detailed product description and features",
+          "primary-key": false
+        },
+        {
+          "name": "Category",
+          "description": "Product category for classification and filtering",
+          "primary-key": false
+        },
+        {
+          "name": "Price",
+          "description": "Unit price of the product (decimal with 2 decimal places)",
+          "primary-key": false
+        },
+        {
+          "name": "Stock",
+          "description": "Current inventory count available for purchase",
+          "primary-key": false
+        },
+        {
+          "name": "IsAvailable",
+          "description": "Availability status (false if out of stock or discontinued)",
+          "primary-key": false
+        }
+      ],
+      "permissions": [
+        {
+          "role": "authenticated",
+          "actions": ["read"]
+        },
+        {
+          "role": "Developers",
+          "actions": ["*"]
+        }
+      ]
+    },
+    "Order": {
+      "source": {
+        "object": "dbo.Orders",
+        "type": "table"
+      },
+      "description": "Customer orders with line items and status tracking",
+      "fields": [
+        {
+          "name": "Id",
+          "description": "Unique identifier for the order (auto-generated)",
+          "primary-key": true
+        },
+        {
+          "name": "UserId",
+          "description": "Foreign key reference to the user who placed the order",
+          "primary-key": false
+        },
+        {
+          "name": "OrderDate",
+          "description": "Order placement timestamp in UTC",
+          "primary-key": false
+        },
+        {
+          "name": "Status",
+          "description": "Order status (e.g., 'pending', 'processing', 'shipped', 'delivered', 'cancelled')",
+          "primary-key": false
+        },
+        {
+          "name": "TotalAmount",
+          "description": "Total order amount including all items (decimal with 2 decimal places)",
+          "primary-key": false
+        },
+        {
+          "name": "Notes",
+          "description": "Optional order notes or special instructions",
+          "primary-key": false
+        }
+      ],
+      "permissions": [
+        {
+          "role": "authenticated",
+          "actions": ["read"]
+        },
+        {
+          "role": "Developers",
+          "actions": ["read"]
+        }
+      ]
+    },
+    "OrderItem": {
+      "source": {
+        "object": "dbo.OrderItems",
+        "type": "table"
+      },
+      "description": "Line items for customer orders with quantity and pricing",
+      "fields": [
+        {
+          "name": "Id",
+          "description": "Unique identifier for the order item (auto-generated)",
+          "primary-key": true
+        },
+        {
+          "name": "OrderId",
+          "description": "Foreign key reference to the parent order",
+          "primary-key": false
+        },
+        {
+          "name": "ProductId",
+          "description": "Foreign key reference to the product being ordered",
+          "primary-key": false
+        },
+        {
+          "name": "Quantity",
+          "description": "Number of units ordered for this product",
+          "primary-key": false
+        },
+        {
+          "name": "UnitPrice",
+          "description": "Price per unit at the time of order (decimal with 2 decimal places)",
+          "primary-key": false
+        }
+      ],
+      "permissions": [
+        {
+          "role": "authenticated",
+          "actions": ["read"]
+        },
+        {
+          "role": "Developers",
+          "actions": ["read"]
+        }
+      ]
+    }
+  }
+}

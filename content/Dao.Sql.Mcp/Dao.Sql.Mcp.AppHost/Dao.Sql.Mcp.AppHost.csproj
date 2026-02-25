@@ -1,0 +1,28 @@
+﻿<Project Sdk="Aspire.AppHost.Sdk/13.1.0">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>93f04767-0a5f-4141-a5fa-dddcc489831e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Azure.ApplicationInsights" Version="13.1.1" />
+    <PackageReference Include="Aspire.Hosting.SqlServer" Version="13.1.1" />
+    <PackageReference Include="CommunityToolkit.Aspire.Hosting.McpInspector" Version="13.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dao.Sql.Mcp.Server\Dao.Sql.Mcp.Server.csproj" />
+    <ProjectReference Include="..\Dao.Sql.Mcp.Shared\Dao.Sql.Mcp.Shared.csproj" IsAspireProjectResource="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="dab-config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

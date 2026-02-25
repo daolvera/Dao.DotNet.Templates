@@ -1,0 +1,16 @@
+# Exclude build artifacts and temporary files
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+
+# Exclude other project files - only dab-config.json is needed
+*.cs
+*.csproj
+*.json
+!dab-config.json
+
+# Exclude documentation
+*.md

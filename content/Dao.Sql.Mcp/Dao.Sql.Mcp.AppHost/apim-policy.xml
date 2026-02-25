@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+APIM Policy for DAB MCP Server
+This policy validates Azure AD tokens and forwards role/group claims to DAB as X-MS-API-ROLE header.
+
+Setup Instructions:
+1. Create an API in APIM that points to your DAB MCP server endpoint
+2. Apply this policy at the API level or operation level
+3. Ensure your DAB server is configured with EntraID authentication (already set in dab-config.json)
+4. The policy extracts roles from both 'roles' and 'groups' claims in the JWT token
+-->
+<policies>
+    <inbound>
+        <base />
+        
+        <!-- Handle CORS preflight OPTIONS requests - bypass authentication -->
+        <choose>
+            <when condition="@(context.Request.Method == "OPTIONS")">
+                <return-response>
+                    <set-status code="200" reason="OK" />
+                    <set-header name="Access-Control-Allow-Origin" exists-action="override">
+                        <value>*</value>
+                    </set-header>
+                    <set-header name="Access-Control-Allow-Methods" exists-action="override">
+                        <value>GET, POST, PUT, DELETE, OPTIONS</value>
+                    </set-header>
+                    <set-header name="Access-Control-Allow-Headers" exists-action="override">
+                        <value>Authorization, Content-Type, Accept</value>
+                    </set-header>
+                    <set-header name="Access-Control-Max-Age" exists-action="override">
+                        <value>3600</value>
+                    </set-header>
+                </return-response>
+            </when>
+        </choose>
+        
+        <!-- Validate Azure AD Token (skip for OPTIONS) -->
+        <validate-azure-ad-token 
+            tenant-id="{{tenant id}}" 
+            header-name="Authorization" 
+            failed-validation-httpcode="401" 
+            failed-validation-error-message="Unauthorized: Invalid or missing Azure AD token" 
+            output-token-variable-name="token">
+            <!-- Client application IDs that are allowed to call this API -->
+            <client-application-ids>
+                <application-id>{{clientApplicationId}}</application-id>
+            </client-application-ids>
+            <!-- Audience - must match your app registration -->
+            <audiences>
+                <audience>{{serverguid}}</audience>
+            </audiences>
+            <!-- Required scope for MCP access -->
+            <required-claims>
+                <claim name="scp" separator=",">
+                    <value>MCP.Access</value>
+                </claim>
+            </required-claims>
+        </validate-azure-ad-token>
+
+        <!-- Extract roles from JWT token claims -->
+        <!-- DAB supports both 'roles' and 'groups' claims from EntraID -->
+        <set-variable name="roles" value="@{
+            var jwt = (Jwt)context.Variables["token"];
+            var rolesList = new List<string>();
+            
+            // Extract from 'roles' claim
+            if (jwt.Claims.ContainsKey("roles"))
+            {
+                var roles = jwt.Claims["roles"];
+                foreach (var role in roles)
+                {
+                    rolesList.Add(role);
+                }
+            }
+            
+            // Extract from 'groups' claim (group object IDs)
+            if (jwt.Claims.ContainsKey("groups"))
+            {
+                var groups = jwt.Claims["groups"];
+                foreach (var group in groups)
+                {
+                    rolesList.Add(group);
+                }
+            }
+            
+            // Return comma-separated list of roles/groups or empty string if none found
+            return rolesList.Count > 0 ? string.Join(",", rolesList) : string.Empty;
+        }" />
+
+        <!-- Set X-MS-API-ROLE header for DAB only if roles exist -->
+        <!-- DAB uses this header to determine user permissions as configured in dab-config.json -->
+        <choose>
+            <when condition="@(!string.IsNullOrEmpty((string)context.Variables["roles"]))">
+                <set-header name="X-MS-API-ROLE" exists-action="override">
+                    <value>@((string)context.Variables["roles"])</value>
+                </set-header>
+            </when>
+        </choose>
+
+        <!-- Optional: Log the roles being forwarded (remove in production) -->
+        <trace source="apim-dab-policy" severity="information">
+            <message>@($"Forwarding roles to DAB: {(string)context.Variables["roles"]}")</message>
+        </trace>
+
+        <!-- Optional: Forward user identity claims to DAB -->
+        <!-- DAB can use these for session context when set-session-context is enabled -->
+        <set-variable name="userId" value="@{
+            var jwt = (Jwt)context.Variables["token"];
+            if (jwt.Claims.ContainsKey("oid"))
+            {
+                return jwt.Claims["oid"].FirstOrDefault();
+            }
+            if (jwt.Claims.ContainsKey("sub"))
+            {
+                return jwt.Claims["sub"].FirstOrDefault();
+            }
+            return string.Empty;
+        }" />
+
+        <!-- Set X-MS-CLIENT-PRINCIPAL-ID header (optional but recommended) -->
+        <set-header name="X-MS-CLIENT-PRINCIPAL-ID" exists-action="override">
+            <value>@((string)context.Variables["userId"])</value>
+        </set-header>
+    </inbound>
+    
+    <backend>
+        <base />
+    </backend>
+    
+    <outbound>
+        <base />
+        
+        <!-- Optional: Remove sensitive headers from response -->
+        <set-header name="X-MS-API-ROLE" exists-action="delete" />
+    </outbound>
+    
+    <on-error>
+        <base />
+        
+        <!-- Custom error handling -->
+        <return-response>
+            <set-status code="@(context.Response.StatusCode)" reason="@(context.Response.StatusReason)" />
+            <set-header name="Content-Type" exists-action="override">
+                <value>application/json</value>
+            </set-header>
+            <set-body>@{
+                return new JObject(
+                    new JProperty("error", new JObject(
+                        new JProperty("code", context.Response.StatusCode.ToString()),
+                        new JProperty("message", context.LastError?.Message ?? "An error occurred"),
+                        new JProperty("source", "APIM Policy")
+                    ))
+                ).ToString();
+            }</set-body>
+        </return-response>
+    </on-error>
+</policies>
