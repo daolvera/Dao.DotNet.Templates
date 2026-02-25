@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Dao.Sql.Mcp.DbInit\Dao.Sql.Mcp.DbInit.csproj" />
     <ProjectReference Include="..\Dao.Sql.Mcp.Server\Dao.Sql.Mcp.Server.csproj" />
     <ProjectReference Include="..\Dao.Sql.Mcp.Shared\Dao.Sql.Mcp.Shared.csproj" IsAspireProjectResource="false" />
   </ItemGroup>

@@ -1,10 +1,9 @@
+using Dao.Sql.Mcp.Server.Services;
+using Microsoft.Extensions.AI;
+using ModelContextProtocol.Server;
 using System.ComponentModel;
 using System.Text.Json;
 using System.Text.Json.Nodes;
-using Dao.Sql.Mcp.Server.Services;
-using Microsoft.Extensions.AI;
-using ModelContextProtocol;
-using ModelContextProtocol.Server;
 
 namespace Dao.Sql.Mcp.Server.Tools;
 
@@ -28,11 +27,10 @@ public class DabProxyTools(
     private const string DeleteRecordToolName = "delete_record";
     private const string ExecuteEntityToolName = "execute_entity";
 
-    private string GetJwtToken()
+    private string? GetJwtToken()
     {
         var authHeader = httpContext.HttpContext?.Request.Headers["Authorization"].ToString();
-        return authHeader?.Replace("Bearer ", "")
-            ?? throw new McpException("Authorization token required");
+        return authHeader?.Replace("Bearer ", "");
     }
 
     /// <summary>

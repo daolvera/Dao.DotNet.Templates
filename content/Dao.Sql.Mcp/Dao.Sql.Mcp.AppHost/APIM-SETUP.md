@@ -14,7 +14,7 @@ Client App → APIM (Token Validation + Role Extraction) → DAB MCP Server (Rol
 2. Azure AD App Registration (Client App)
 3. Azure AD App Registration (Resource/API)
 4. DAB MCP Server endpoint URL (from Aspire deployment)
-5. Tenant ID:
+5. Tenant ID
 
 ## Step 1: Configure Azure AD App Registrations
 

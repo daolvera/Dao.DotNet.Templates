@@ -1,4 +1,5 @@
 using Dao.Sql.Mcp.Shared;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
@@ -10,6 +11,12 @@ var sqlServer = builder
 
 var db = sqlServer.AddDatabase(ProjectNames.Database);
 
+// Database initialization project - seeds the database using EF Core (idempotent)
+var dbInit = builder
+    .AddProject<Projects.Dao_Sql_Mcp_DbInit>(ProjectNames.DbInit)
+    .WithReference(db)
+    .WaitFor(db);
+
 var insights = builder.AddAzureApplicationInsights("MyApplicationInsights");
 
 // SQL MCP Server (Data API Builder) - provides 6 DML tools
@@ -20,7 +27,7 @@ var dabMcpServer = builder
     .WithExternalHttpEndpoints()
     .WithEnvironment("MSSQL_CONNECTION_STRING", db)
     .WithEnvironment("APPLICATIONINSIGHTS_CONNECTION_STRING", insights)
-    .WaitFor(db)
+    .WaitFor(dbInit)
     .WithUrls(x =>
     {
         x.Urls.Add(

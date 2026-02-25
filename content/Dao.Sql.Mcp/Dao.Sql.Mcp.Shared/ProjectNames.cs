@@ -5,6 +5,7 @@ public static class ProjectNames
     public const string McpServer = "mcp-server";
     public const string DabMcpServer = "dab-mcp";
     public const string Database = "db";
+    public const string DbInit = "db-init";
 
     extension(Uri)
     {
