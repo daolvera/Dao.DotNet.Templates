@@ -45,6 +45,7 @@ builder.Services.AddSingleton(sp =>
 });
 
 // Register DAB MCP Client Service
+builder.Services.AddMemoryCache();
 builder.Services.AddSingleton<DabMcpClientService>();
 builder.Services.AddHttpClient(ProjectNames.DabMcpServer);
 

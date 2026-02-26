@@ -1,4 +1,5 @@
 using Dao.Sql.Mcp.Shared;
+using Microsoft.Extensions.Caching.Memory;
 using ModelContextProtocol.Client;
 
 namespace Dao.Sql.Mcp.Server.Services;
@@ -9,9 +10,12 @@ namespace Dao.Sql.Mcp.Server.Services;
 /// </summary>
 public class DabMcpClientService(
     IHttpClientFactory httpClientFactory,
+    IMemoryCache memoryCache,
     ILogger<DabMcpClientService> logger
 )
 {
+    private const string EnabledToolsCacheKey = "dab:enabled_tools";
+
     /// <summary>
     /// Creates an MCP client connected to the DAB MCP Server.
     /// </summary>
@@ -42,5 +46,41 @@ public class DabMcpClientService(
         logger.LogInformation("DAB MCP client connected successfully");
 
         return client;
+    }
+
+    /// <summary>
+    /// Returns the set of tool names currently enabled in DAB, cached for 5 minutes.
+    /// Returns an empty set on failure (fail-open — tool availability checked at DAB level).
+    /// </summary>
+    public async Task<IReadOnlySet<string>> GetEnabledToolsAsync(
+        string? jwtToken,
+        CancellationToken cancellationToken = default
+    )
+    {
+        if (
+            memoryCache.TryGetValue(EnabledToolsCacheKey, out IReadOnlySet<string>? cached)
+            && cached != null
+        )
+            return cached;
+
+        try
+        {
+            var client = await CreateClientAsync(jwtToken);
+            var tools = await client.ListToolsAsync(cancellationToken: cancellationToken);
+            IReadOnlySet<string> names = tools.Select(t => t.Name).ToHashSet();
+
+            memoryCache.Set(EnabledToolsCacheKey, names, TimeSpan.FromMinutes(5));
+            logger.LogInformation(
+                "Discovered {Count} enabled DAB tools: {Names}",
+                names.Count,
+                string.Join(", ", names)
+            );
+            return names;
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "Could not discover DAB tool list; allowing tool call through");
+            return new HashSet<string>();
+        }
     }
 }
