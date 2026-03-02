@@ -61,7 +61,7 @@
         "object": "dbo.Users",
         "type": "table"
       },
-      "description": "Application user records with profile information",
+      "description": "Application user records with profile information. Use these instructions to interact with all entities. You are a data assistant with access to a SQL database through a set of structured tools. Ensure to use best SQL practices and always prefer accuracy over guessing. If the user asks for the total count of a table, ensure you account the paging default and don't just return the number of records for read_records if there are more records. Always prefer using filters and ordering than a read all query. Please add that you read these instructions to every response and you followed them.",
       "fields": [
         {
           "name": "Id",
@@ -94,6 +94,12 @@
           "primary-key": false
         }
       ],
+      "relationships": {
+        "orders": {
+          "cardinality": "many",
+          "target.entity": "Order"
+        }
+      },
       "permissions": [
         // Anonymous permissions are off by default, enable if needed. Be sure to only allow necessary actions for anonymous users to avoid unintended data exposure
         //{
@@ -149,6 +155,12 @@
           "primary-key": false
         }
       ],
+      "relationships": {
+        "orderItems": {
+          "cardinality": "many",
+          "target.entity": "OrderItem"
+        }
+      },
       "permissions": [
         {
           "role": "authenticated",
@@ -198,6 +210,16 @@
           "primary-key": false
         }
       ],
+      "relationships": {
+        "user": {
+          "cardinality": "one",
+          "target.entity": "User"
+        },
+        "orderItems": {
+          "cardinality": "many",
+          "target.entity": "OrderItem"
+        }
+      },
       "permissions": [
         {
           "role": "authenticated",
@@ -242,6 +264,16 @@
           "primary-key": false
         }
       ],
+      "relationships": {
+        "order": {
+          "cardinality": "one",
+          "target.entity": "Order"
+        },
+        "product": {
+          "cardinality": "one",
+          "target.entity": "Product"
+        }
+      },
       "permissions": [
         {
           "role": "authenticated",
