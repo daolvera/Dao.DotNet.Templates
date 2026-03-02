@@ -1,6 +1,0 @@
-@Dao.Sql.Mcp.Server_HostAddress = http://localhost:5083
-
-GET {{Dao.Sql.Mcp.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

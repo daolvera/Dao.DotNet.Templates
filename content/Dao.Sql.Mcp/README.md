@@ -1,41 +1,25 @@
-# Dao.Sql.Mcp - AI-Enhanced Proxy for SQL MCP Server (Data API Builder)
+# Dao.Sql.Mcp - Data API Builder (DAB) MCP Server Template
 
-An intelligent .NET Aspire MCP proxy that sits in front of Microsoft's Data API Builder (DAB) SQL MCP Server, enhancing queries with AI-powered optimization for paging, ordering, and count visibility. **Solves the pagination problem where AI agents don't realize there are more results beyond the first page.**
+A .NET Aspire template for deploying Microsoft's Data API Builder (DAB) as an MCP server, providing AI agents with secure, authenticated access to SQL Server databases through standardized MCP tools.
 
-## The Problem This Solves
+## What This Template Provides
 
-When AI agents query databases through Data API Builder's `read_records` tool, they often don't understand pagination:
-- Agent asks "How many items are in this table?"
-- DAB returns 100 results (default page size)
-- Agent assumes there are exactly 100 items
-- **Reality**: There might be 250, 1000, or more items
-
-The AI agent has no visibility into:
-- Total record count
-- Whether more pages exist
-- How to fetch subsequent pages
-
-## The Solution
-
-This proxy intercepts MCP tool calls to DAB and enhances them with:
-- **Total count metadata** - AI agents see the full dataset size
-- **Pagination guidance** - Clear indicators of `has_more_pages`, `next_skip` values
-- **AI-suggested defaults** - Intelligent `top` and `orderby` recommendations
-- **Pass-through authentication** - JWT tokens forwarded securely to DAB
+This template gives you a complete .NET Aspire solution for running Data API Builder (DAB) as an MCP server:
+- **Pre-configured DAB MCP Server** - Microsoft's production-ready SQL MCP implementation
+- **Azure AD Authentication** - JWT token validation with role-based access control
+- **SQL Server Integration** - Local development with Docker, production-ready connection handling
+- **.NET Aspire Orchestration** - Automatic service discovery, health checks, and observability
+- **MCP Inspector Support** - Test and debug MCP tools during development
 
 ## Architecture
 
 ```
 AI Agent (Claude, GPT, etc.)
     ↓
-Proxy MCP Server (Dao.Sql.Mcp.Server)
-    - AI query enhancement via Azure OpenAI
-    - Pagination metadata injection
-    - JWT pass-through authentication
-    ↓
-SQL MCP Server / DAB (Data API Builder)
+DAB MCP Server (Data API Builder)
     - 6 DML tools (describe_entities, read_records, etc.)
     - OData query building
+    - JWT authentication
     - RBAC enforcement
     ↓
 SQL Server Database
@@ -43,35 +27,34 @@ SQL Server Database
 
 ## Features
 
-### Core Architecture
-- **AI-Enhanced Query Proxy**: Uses `IChatClient` to suggest optimal paging and ordering
-- **Transparent Pass-Through**: Other tools (create, update, delete) forward directly to DAB
-- **Pagination Visibility**: Returns `total_count`, `has_more_pages`, `next_skip` with every query
-- **SQL MCP Server (DAB)**: Microsoft's production-ready MCP implementation for SQL databases
-- **Azure AD Authentication**: JWT token validation and forwarding
+### Core Capabilities
+- **DAB MCP Server**: Microsoft's production-ready MCP implementation for SQL databases
+- **6 MCP Tools**: Full CRUD operations plus stored procedure execution
+- **OData Query Support**: Powerful filtering, sorting, and pagination
+- **Azure AD Authentication**: JWT token validation with role-based access control
 
-### MCP Tools (Proxied from DAB)
+### MCP Tools (from DAB)
 All six DML tools from Microsoft's SQL MCP Server:
-1. **`describe_entities`** - Lists available tables/views/procedures (direct pass-through)
-2. **`read_records`** - Queries data with **AI-enhanced paging** and count metadata
-3. **`create_record`** - Inserts new records (direct pass-through)
-4. **`update_record`** - Modifies existing records (direct pass-through)
-5. **`delete_record`** - Removes records (direct pass-through)
-6. **`execute_entity`** - Runs stored procedures (direct pass-through)
+
+1. **`describe_entities`** - Lists available tables/views/procedures with schema information
+2. **`read_records`** - Queries data with OData filters, ordering, and pagination
+3. **`create_record`** - Inserts new records
+4. **`update_record`** - Modifies existing records
+5. **`delete_record`** - Removes records
+6. **`execute_entity`** - Runs stored procedures
 
 ### Infrastructure
-- **.NET Aspire Orchestration**: Manages SQL Server, DAB, and proxy containers
+- **.NET Aspire Orchestration**: Manages SQL Server and DAB containers
 - **Service Discovery**: Automatic service-to-service communication
 - **OpenTelemetry**: Built-in logging, tracing, and metrics
 - **Health Checks**: Comprehensive health monitoring
-- **MCP Inspector**: Test both proxy and direct DAB access
+- **MCP Inspector**: Test DAB MCP tools during development
 
 ## Prerequisites
 
 - .NET 10 SDK or later
 - Docker Desktop (for SQL Server and DAB containers)
 - Azure AD tenant (for authentication)
-- Azure OpenAI account (for query enhancement)
 - Optional: SQL Server Management Studio or Azure Data Studio
 
 ## Quick Start
@@ -85,13 +68,13 @@ dotnet new install Dao.Templates
 ### 2. Create a New Project
 
 ```bash
-dotnet new sql-mcp-proxy -n MyMcpApp
+dotnet new sql-mcp -n MyMcpApp
 cd MyMcpApp
 ```
 
-### 3. Configure Authentication and AI
+### 3. Configure Authentication
 
-Update `appsettings.json` in `Dao.Sql.Mcp.Server` project:
+Update `appsettings.json` in `Dao.Sql.Mcp.Server` project (if using Azure AD):
 
 ```json
 {
@@ -101,11 +84,6 @@ Update `appsettings.json` in `Dao.Sql.Mcp.Server` project:
     "ClientId": "YOUR-CLIENT-ID",
     "Audience": "api://YOUR-CLIENT-ID",
     "Domain": "yourdomain.onmicrosoft.com"
-  },
-  "AzureOpenAI": {
-    "Endpoint": "https://your-openai.openai.azure.com/",
-    "DeploymentName": "gpt-4o",
-    "ApiKey": "YOUR-API-KEY"
   }
 }
 ```
@@ -136,40 +114,30 @@ dotnet run --project Dao.Sql.Mcp.AppHost
 The Aspire dashboard opens showing:
 - **SQL Server** container
 - **DAB MCP Server** (SQL MCP Server) on port 5000
-- **Proxy MCP Server** on assigned HTTPS port
-- **MCP Inspector** connected to both servers
+- **MCP Inspector** connected to DAB
 
 ### 5. Test with MCP Inspector
 
-Open MCP Inspector and test the **Proxy MCP (AI-Enhanced)** server:
+Open MCP Inspector and test the DAB MCP server:
 
-**Query Products (Enhanced):**
-```json
-{
-  "entity_name": "Product"
-}
-```
-
-**Response includes pagination metadata:**
+**Query Products:**
 ```json
 {
   "entity_name": "Product",
-  "records": [...],
-  "total_count": 250,
-  "returned_count": 100,
-  "current_skip": 0,
-  "current_top": 100,
-  "has_more_pages": true,
-  "next_skip": 100,
-  "filter_applied": null,
-  "orderby_applied": "ProductId asc"
+  "$top": 10,
+  "$orderby": "ProductId"
 }
 ```
 
-**AI Agent now knows:**
-- There are 250 total products (not just 100)
-- More pages exist
-- Next query should use `skip: 100` to get items 101-200
+**Response:**
+```json
+{
+  "records": [...],
+  "metadata": {
+    "count": 10
+  }
+}
+```
 
 ## Project Structure
 
@@ -179,45 +147,35 @@ MyMcpApp/
 │   ├── AppHost.cs                    # Service configuration
 │   ├── dab-config.json               # Data API Builder (DAB) configuration
 │   └── Dockerfile.dab                # DAB container definition
-├── Dao.Sql.Mcp.Server/               # AI-Enhanced MCP Proxy Server
-│   ├── Program.cs                    # Authentication and service registration
-│   ├── Services/
-│   │   └── DabMcpClientService.cs    # DAB MCP client factory
-│   └── Tools/
-│       └── DabProxyTools.cs          # 6 proxied DML tools with AI enhancement
+├── Dao.Sql.Mcp.DbInit/               # Database initialization
+│   └── DatabaseInitializer.cs        # Sample data seeding
 ├── Dao.Sql.Mcp.ServiceDefaults/      # Aspire service defaults (telemetry, health)
 ├── Dao.Sql.Mcp.Shared/               # Common models and configuration
 │   ├── ProjectNames.cs               # Service discovery constants
 │   ├── Roles.cs                      # Role constants for authorization
 │   └── Options/
-│       ├── AzureAdOptions.cs         # Azure AD configuration
-│       └── AzureOpenAIOptions.cs     # Azure OpenAI configuration
+│       └── AzureAdOptions.cs         # Azure AD configuration
 └── Dao.Sql.Mcp.Tests/                # Integration tests
 ```
 
-## How AI Query Enhancement Works
+## How DAB MCP Works
 
-When an AI agent calls `read_records`, the proxy:
+## How DAB MCP Works
 
-1. **Receives the query** from the AI agent with entity name and optional filters
-2. **Consults IChatClient (Azure OpenAI)** to suggest:
-   - Default `top` value (typically 100 if not specified)
-   - Appropriate `orderby` clause for consistent pagination
-   - Rationale for the suggestions
-3. **Forwards enhanced query to DAB** with optimized parameters
-4. **Receives DAB response** with raw data and OData count
-5. **Augments response** with pagination metadata:
-   - `total_count` - Full dataset size
-   - `returned_count` - Records in this response
-   - `has_more_pages` - Boolean indicator
-   - `next_skip` - Value for fetching next page
-6. **Returns to AI agent** with complete visibility
+When an AI agent calls MCP tools through DAB:
 
-This ensures AI agents can:
-- Understand the full scope of data available
-- Make informed decisions about fetching more pages
-- Provide accurate counts to users
-- Iterate through large datasets efficiently
+1. **Agent sends MCP request** - Uses tools like `read_records` with entity name and optional filters
+2. **DAB validates JWT token** - Ensures user is authenticated and authorized
+3. **DAB builds OData query** - Converts MCP parameters to optimized T-SQL
+4. **Query executes on SQL Server** - With appropriate filtering, paging, and ordering
+5. **DAB returns structured data** - JSON response with records and metadata
+6. **Agent processes results** - Uses data to answer user questions or take actions
+
+DAB handles:
+- **Authentication & Authorization**: JWT validation and role-based access control
+- **Query Building**: OData to T-SQL conversion with parameterization
+- **Security**: SQL injection prevention, row-level security enforcement
+- **Performance**: Query optimization, connection pooling, optional caching
 
 ## Documentation
 
@@ -311,29 +269,34 @@ private static readonly HashSet<string> ValidRegions = ["NORTH", "SOUTH", "EAST"
 
 ## Development Workflow
 
-### Customizing Query Enhancement
+### Customizing DAB Configuration
 
-The proxy's AI enhancement logic can be customized in `Dao.Sql.Mcp.Server/Tools/DabProxyTools.cs`:
+You can customize DAB's behavior in `Dao.Sql.Mcp.AppHost/dab-config.json`:
 
-```csharp
-// Modify the enhancement prompt in read_records method
-var enhancementPrompt = $@"Enhance this database query with best practices:
-Entity: {entity_name}
-Filter: {filter ?? "none"}
-
-Your custom instructions here...
-Respond in JSON: {{ ""recommended_top"": number, ""recommended_orderby"": ""string"" }}";
+```json
+{
+  "runtime": {
+    "cache": {
+      "enabled": true,
+      "ttl-seconds": 5
+    },
+    "pagination": {
+      "default-page-size": 100,
+      "max-page-size": 100000
+    }
+  }
+}
 ```
 
 You can adjust:
-- Default `top` values based on entity type
-- Ordering strategies (temporal data vs. alphabetical)
-- Filter optimization suggestions
-- Prompt engineering for better AI responses
+- Default and maximum page sizes
+- Caching behavior
+- CORS policies
+- Authentication settings
 
 ### Adding Database Entities (DAB Configuration)
 
-To expose new tables/views through the proxy:
+To expose new tables/views through DAB:
 
 1. Ensure table exists in SQL Server database
 2. Add entity configuration to `Dao.Sql.Mcp.AppHost/dab-config.json`:
@@ -410,21 +373,21 @@ azd deploy
 
 Before going to production, review:
 
-- [ ] Replace placeholder Azure AD credentials in `dab-config.json`
+- [ ] Configure Azure AD credentials in `dab-config.json`
 - [ ] Create Application Insights resource in Azure
-- [ ] Set `APPLICATIONINSIGHTS_CONNECTION_STRING` in configuration for both DAB and custom server  
+- [ ] Set `APPLICATIONINSIGHTS_CONNECTION_STRING` in DAB configuration
 - [ ] Store connection strings in Azure Key Vault
 - [ ] Enable SQL Server encryption: `Encrypt=True`
-- [ ] Configure Azure AD group IDs in authorization policies
+- [ ] Configure Azure AD group IDs in DAB permissions
 - [ ] Enable SQL Server audit logging
 - [ ] Set up Application Insights alerts for errors, performance, and availability
 - [ ] Configure CORS for production origins (no wildcards)
 - [ ] Test all authorization policies with real Azure AD groups
 - [ ] Review and test row-level security policies
-- [ ] Add rate limiting on endpoints
+- [ ] Add rate limiting if using API Management
 - [ ] Configure database backups
 - [ ] Set up monitoring dashboards
-- [ ] Set log levels to Information or higher (not Debug/Trace)
+- [ ] Set DAB log levels to Information or higher (not Debug/Trace)
 
 See [SQL_SERVER_MCP_BEST_PRACTICES.md](docs/SQL_SERVER_MCP_BEST_PRACTICES.md) for complete checklist.
 
@@ -471,19 +434,17 @@ Enable detailed logging in `appsettings.Development.json`:
 ## Performance Optimization
 
 **DAB MCP Built-in Features:**
+
 - **Automatic Caching**: DAB caches `read_records` results (configurable TTL)
 - **Connection Pooling**: Managed by DAB's SQL Server integration
 - **Query Optimization**: DAB builds deterministic, optimized T-SQL
 
-**Proxy Enhancements:**
-- **AI Suggestion Caching**: Consider caching AI enhancement suggestions for common entity types
-- **Pagination Defaults**: Proxy applies reasonable defaults (top=100) to prevent unbounded queries
-- **Telemetry**: OpenTelemetry spans track proxy overhead vs. DAB call time
-
 **DAB Configuration:**
+
 - Enable caching in `dab-config.json`: `"cache": { "enabled": true, "ttl-seconds": 300 }`
 - Add database indexes for frequently filtered/sorted fields
 - Use views for complex joins to simplify client queries
+- Configure appropriate page sizes based on your data
 
 ## External Resources
 
@@ -502,11 +463,12 @@ Issues and pull requests welcome! This is a community-driven template.
 
 ## Next Steps
 
-1. Configure Azure AD and Azure OpenAI credentials
-2. Customize `dab-config.json` for your database entities
+1. Configure Azure AD credentials in `dab-config.json`
+2. Customize database entities for your schema
 3. Deploy to Azure Container Apps or Azure App Service
 4. Test with AI agents (Claude, GPT, etc.) via MCP protocol
-5. Monitor query patterns and optimize pagination defaults
-6. Add custom database views for complex analytical queries
+5. Monitor query patterns and optimize database indexes
+6. Add row-level security policies for multi-tenant scenarios
+7. Consider Azure API Management for additional API governance
 
-Happy building with AI-enhanced SQL MCP! 🚀
+Happy building with DAB MCP! 🚀

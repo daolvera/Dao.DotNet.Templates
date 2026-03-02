@@ -22,7 +22,7 @@ var insights = builder.AddAzureApplicationInsights("MyApplicationInsights");
 // SQL MCP Server (Data API Builder) - provides 6 DML tools
 // Tools: describe_entities, create_record, read_records, update_record, delete_record, execute_entity
 var dabMcpServer = builder
-    .AddDockerfile("dab-mcp", ".", "Dockerfile.dab")
+    .AddDockerfile(ProjectNames.DabMcpServer, ".", "Dockerfile.dab")
     .WithHttpEndpoint(targetPort: 5000, name: "http")
     .WithExternalHttpEndpoints()
     .WithEnvironment("MSSQL_CONNECTION_STRING", db)
@@ -40,16 +40,7 @@ var dabMcpServer = builder
         );
     });
 
-// AI-Enhanced MCP Proxy Server - sits in front of DAB to add query intelligence
-// Enhances read_records with paging metadata and AI-suggested defaults
-// Solves pagination visibility problem for AI agents
-var mcpServer = builder
-    .AddProject<Projects.Dao_Sql_Mcp_Server>(ProjectNames.McpServer)
-    .WithExternalHttpEndpoints()
-    .WithEnvironment("services__dab-mcp__http__0", dabMcpServer.GetEndpoint("http"))
-    .WaitFor(dabMcpServer);
-
-// MCP Inspector for testing proxy access
-builder.AddMcpInspector("inspector").WithMcpServer(mcpServer).WaitFor(mcpServer);
+// MCP Inspector for testing
+builder.AddMcpInspector("inspector").WithMcpServer(dabMcpServer).WaitFor(dabMcpServer);
 
 builder.Build().Run();

@@ -2,7 +2,6 @@
   <Project Path="Dao.Sql.Mcp.AppHost/Dao.Sql.Mcp.AppHost.csproj" />
   <Project Path="Dao.Sql.Mcp.Data/Dao.Sql.Mcp.Data.csproj" />
   <Project Path="Dao.Sql.Mcp.DbInit/Dao.Sql.Mcp.DbInit.csproj" />
-  <Project Path="Dao.Sql.Mcp.Server/Dao.Sql.Mcp.Server.csproj" />
   <Project Path="Dao.Sql.Mcp.ServiceDefaults/Dao.Sql.Mcp.ServiceDefaults.csproj" />
   <Project Path="Dao.Sql.Mcp.Shared/Dao.Sql.Mcp.Shared.csproj" Id="5c2e8500-26f2-48f5-8303-b88d7b4280fc" />
 </Solution>
