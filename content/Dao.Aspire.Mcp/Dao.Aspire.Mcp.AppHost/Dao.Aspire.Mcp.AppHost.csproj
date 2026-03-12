@@ -15,7 +15,9 @@
   </ItemGroup>
 
   <ItemGroup>
+  <!--#if IncludeWebClient -->
     <ProjectReference Include="..\Dao.Aspire.Mcp.Client\Dao.Aspire.Mcp.Client.csproj" />
+    <!--#endif -->
     <ProjectReference Include="..\Dao.Aspire.Mcp.Server\Dao.Aspire.Mcp.Server.csproj" />
     <ProjectReference Include="..\Dao.Aspire.Mcp.Shared\Dao.Aspire.Mcp.Shared.csproj" IsAspireProjectResource="false" />
   </ItemGroup>

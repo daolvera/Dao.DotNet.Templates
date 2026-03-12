@@ -91,7 +91,8 @@
             "**/obj/**",
             "**/.vs/**",
             "**/.vscode/**",
-            "**/.azure/**"
+            "**/.azure/**",
+            "Dao.Aspire.Mcp.slnx"
           ]
         }
       ]
