@@ -10,13 +10,17 @@ dotnet new install Dao.Templates
 
 ## Templates
 
-### .NET Aspire MCP Server and Client (`aspire-mcp`)
+### .NET Aspire MCP Server and Client (`dao-aspire-mcp`)
 
 Full-featured .NET Aspire application with Model Context Protocol server and Blazor client.
 
-## .NET Aspire Sql Server MCP (`sql-mcp`)
+## .NET Aspire Sql Server MCP (`dao-sql-mcp`)
 
 .NET Aspire application that hosts a [Data Api Sql Server](https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/overview) to provide access to a database in a governed and managed way.
+
+## .NET Aspire with EF (`dao-aspire-ef`)
+
+.NET Aspire application that has Entity Framework Core with a migration service created to quickstart apps with the needed infrastructure.
 
 ## Documentation
 
