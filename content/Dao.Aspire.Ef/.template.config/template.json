@@ -3,8 +3,8 @@
   "author": "DaoCodes",
   "classifications": ["Web", "SQL", "EF"],
   "identity": "Dao.Aspire.Ef.Template",
-  "name": ".NET SQL EF Server",
-  "shortName": "aspire-ef",
+  "name": ".NET Aspire with EF Core",
+  "shortName": "dao-aspire-ef",
   "tags": {
     "language": "C#",
     "type": "solution"

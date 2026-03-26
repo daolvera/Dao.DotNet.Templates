@@ -4,7 +4,7 @@
   "classifications": ["Web", "SQL", "MCP", "AI"],
   "identity": "Dao.Sql.Mcp.Template",
   "name": ".NET SQL MCP Server",
-  "shortName": "sql-mcp",
+  "shortName": "dao-sql-mcp",
   "tags": {
     "language": "C#",
     "type": "solution"

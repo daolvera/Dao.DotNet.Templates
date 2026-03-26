@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/ide.host",
+  "order": 200,
+  "icon": "favicon.ico",
+  "supportsDocker": true,
+  "symbolInfo": [
+    {
+      "id": "IncludeAuthentication",
+      "isVisible": true
+    },
+    {
+      "id": "IncludeWebClient",
+      "isVisible": true
+    },
+    {
+      "id": "IncludeDatabase",
+      "isVisible": true
+    },
+    {
+      "id": "IncludeRoleBasedAuth",
+      "isVisible": true
+    },
+    {
+      "id": "IncludeSampleData",
+      "isVisible": true
+    },
+    {
+      "id": "IncludeMcpInspector",
+      "isVisible": true
+    },
+    {
+      "id": "IncludeApplicationInsights",
+      "isVisible": true
+    }
+  ]
+}

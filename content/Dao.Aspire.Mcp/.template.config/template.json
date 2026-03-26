@@ -4,7 +4,7 @@
   "classifications": ["Web", "Aspire", "MCP", "AI"],
   "identity": "Dao.Aspire.Mcp.Template",
   "name": ".NET Aspire MCP Server and Client",
-  "shortName": "aspire-mcp",
+  "shortName": "dao-aspire-mcp",
   "tags": {
     "language": "C#",
     "type": "solution"
