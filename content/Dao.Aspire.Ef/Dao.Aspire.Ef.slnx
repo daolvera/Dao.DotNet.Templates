@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Readme.md" />
+  </Folder>
+  <Project Path="Dao.Aspire.Ef.ApiService/Dao.Aspire.Ef.ApiService.csproj" />
+  <Project Path="Dao.Aspire.Ef.AppHost/Dao.Aspire.Ef.AppHost.csproj" />
+  <Project Path="Dao.Aspire.Ef.Core/Dao.Aspire.Ef.Core.csproj" Id="a1c287b4-1be0-4080-b5d1-ad9ddd6bab50" />
+  <Project Path="Dao.Aspire.Ef.Infrastructure/Dao.Aspire.Ef.Infrastructure.csproj" Id="86dd29ac-e26c-44a9-9896-bc78e89a80a4" />
+  <Project Path="Dao.Aspire.Ef.MigrationService/Dao.Aspire.Ef.MigrationService.csproj" />
+  <Project Path="Dao.Aspire.Ef.ServiceDefaults/Dao.Aspire.Ef.ServiceDefaults.csproj" />
+</Solution>

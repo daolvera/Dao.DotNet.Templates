@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Dao.Aspire.Ef.MigrationService-a323a157-1f3f-492d-9cd4-2d998a725d78</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Azure.Npgsql.EntityFrameworkCore.PostgreSQL" Version="13.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Dao.Aspire.Ef.Core\Dao.Aspire.Ef.Core.csproj" />
+    <ProjectReference Include="..\Dao.Aspire.Ef.Infrastructure\Dao.Aspire.Ef.Infrastructure.csproj" />
+    <ProjectReference Include="..\Dao.Aspire.Ef.ServiceDefaults\Dao.Aspire.Ef.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>

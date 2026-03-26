@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "DaoCodes",
+  "classifications": ["Web", "SQL", "EF"],
+  "identity": "Dao.Aspire.Ef.Template",
+  "name": ".NET SQL EF Server",
+  "shortName": "aspire-ef",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "Dao.Aspire.Ef",
+  "preferNameDirectory": true,
+  "symbols": {},
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "exclude": [
+            "**/bin/**",
+            "**/obj/**",
+            "**/.vs/**",
+            "**/.vscode/**",
+            "**/.azure/**"
+          ]
+        }
+      ]
+    }
+  ]
+}
