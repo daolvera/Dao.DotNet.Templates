@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "DaoCodes",
+  "classifications": ["Web", "Angular", "Aspire"],
+  "identity": "Dao.Aspire.Angular.Template",
+  "name": ".NET Aspire with Angular",
+  "shortName": "dao-aspire-angular",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "Dao.Aspire.Angular",
+  "preferNameDirectory": true,
+  "symbols": {},
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "exclude": [
+            "**/bin/**",
+            "**/obj/**",
+            "**/.vs/**",
+            "**/.vscode/**",
+            "**/.azure/**",
+            "**/node_modules/**"
+          ]
+        }
+      ]
+    }
+  ]
+}

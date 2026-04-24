@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="Dao.Aspire.Angular.Api/Dao.Aspire.Angular.Api.csproj" />
+  <Project Path="Dao.Aspire.Angular.AppHost/Dao.Aspire.Angular.AppHost.csproj" />
+  <Project Path="Dao.Aspire.Angular.ServiceDefaults/Dao.Aspire.Angular.ServiceDefaults.csproj" />
+</Solution>

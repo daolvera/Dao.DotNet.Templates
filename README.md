@@ -18,6 +18,10 @@ Full-featured .NET Aspire application with Model Context Protocol server and Bla
 
 .NET Aspire application that hosts a [Data Api Sql Server](https://learn.microsoft.com/en-us/azure/data-api-builder/mcp/overview) to provide access to a database in a governed and managed way.
 
+## .NET Aspire + Angular (`dao-aspire-angular`)
+
+.NET Aspire application with an Angular frontend and C# API, ready for cloud deployment with `azd up`. Uses the backend-serves-frontend model — in dev mode Angular runs separately with a proxy, in production a single container serves both the API and the Angular static files.
+
 ## .NET Aspire with EF (`dao-aspire-ef`)
 
 .NET Aspire application that has Entity Framework Core with a migration service created to quickstart apps with the needed infrastructure.
