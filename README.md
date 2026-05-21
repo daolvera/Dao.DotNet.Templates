@@ -22,9 +22,20 @@ Full-featured .NET Aspire application with Model Context Protocol server and Bla
 
 .NET Aspire application with an Angular frontend and C# API, ready for cloud deployment with `azd up`. Uses the backend-serves-frontend model — in dev mode Angular runs separately with a proxy, in production a single container serves both the API and the Angular static files.
 
+**Options:**
+- `--IncludeSignalR true` — adds a `NotificationHub` to the API and a live notification badge service + component to the Angular app (proxied via `/hubs` with WebSocket support).
+
 ## .NET Aspire with EF (`dao-aspire-ef`)
 
 .NET Aspire application that has Entity Framework Core with a migration service created to quickstart apps with the needed infrastructure.
+
+## .NET Aspire with Avalonia Desktop (`dao-aspire-avalonia`)
+
+.NET Aspire application with an Avalonia MVVM desktop app and C# API. Uses `IHost` for dependency injection, a typed `IApiService` for HTTP communication, and the Aspire `IsRunMode` pattern to inject the API base URL into the desktop app at startup.
+
+## .NET Aspire with Expo (React Native) (`dao-aspire-expo`)
+
+.NET Aspire application with an Expo React Native mobile app and C# API. Aspire orchestrates the Metro bundler via `AddJavaScriptApp` in dev mode and passes the API base URL via `EXPO_PUBLIC_API_URL`.
 
 ## Documentation
 

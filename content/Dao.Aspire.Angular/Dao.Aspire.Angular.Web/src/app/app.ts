@@ -1,10 +1,17 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { WeatherComponent } from './weather/weather.component';
+//#if (IncludeSignalR)
+import { NotificationBadgeComponent } from './signalr/notification-badge.component';
+//#endif
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, WeatherComponent],
+  imports: [RouterOutlet, WeatherComponent,
+//#if (IncludeSignalR)
+    NotificationBadgeComponent,
+//#endif
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

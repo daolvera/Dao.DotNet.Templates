@@ -9,4 +9,12 @@ module.exports = {
     secure: false,
     changeOrigin: true,
   },
+//#if (IncludeSignalR)
+  '/hubs': {
+    target: apiUrl,
+    secure: false,
+    changeOrigin: true,
+    ws: true,
+  },
+//#endif
 };
