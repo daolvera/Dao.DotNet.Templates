@@ -11,10 +11,42 @@
   },
   "sourceName": "Dao.Aspire.Angular",
   "preferNameDirectory": true,
-  "symbols": {},
+  "symbols": {
+    "IncludeSignalR": {
+      "type": "parameter",
+      "datatype": "bool",
+      "description": "Add a SignalR hub to the API and a live notification service + badge component to the Angular app.",
+      "defaultValue": "false"
+    }
+  },
+  "specialCustomOperations": {
+    "**/*.ts": {
+      "operations": [
+        {
+          "type": "conditional",
+          "configuration": {
+            "if": ["//#if"],
+            "else": ["//#else"],
+            "elseif": ["//#elseif"],
+            "endif": ["//#endif"],
+            "evaluator": "C++",
+            "trim": true,
+            "wholeLine": true
+          }
+        }
+      ]
+    }
+  },
   "sources": [
     {
       "modifiers": [
+        {
+          "condition": "(!IncludeSignalR)",
+          "exclude": [
+            "Dao.Aspire.Angular.Api/Hubs/**",
+            "Dao.Aspire.Angular.Web/src/app/signalr/**"
+          ]
+        },
         {
           "exclude": [
             "**/bin/**",
