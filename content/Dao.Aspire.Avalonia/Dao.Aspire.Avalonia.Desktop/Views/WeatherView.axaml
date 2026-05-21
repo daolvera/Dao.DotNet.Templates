@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Dao.Aspire.Avalonia.Desktop.ViewModels"
+             x:Class="Dao.Aspire.Avalonia.Desktop.Views.WeatherView"
+             x:DataType="vm:WeatherViewModel">
+  <Grid RowDefinitions="Auto,*" Margin="24">
+    <TextBlock Grid.Row="0" Text="Weather Forecast" FontSize="24" FontWeight="SemiBold" Margin="0,0,0,16" />
+    <Panel Grid.Row="1">
+      <TextBlock Text="Loading..." IsVisible="{Binding IsLoading}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      <TextBlock Text="{Binding ErrorMessage}" IsVisible="{Binding ErrorMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                 Foreground="Red" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      <DataGrid ItemsSource="{Binding Forecasts}"
+                IsVisible="{Binding !IsLoading}"
+                AutoGenerateColumns="False"
+                IsReadOnly="True"
+                CanUserSortColumns="True">
+        <DataGrid.Columns>
+          <DataGridTextColumn Header="Date" Binding="{Binding Date}" />
+          <DataGridTextColumn Header="Temp °C" Binding="{Binding TemperatureC}" />
+          <DataGridTextColumn Header="Temp °F" Binding="{Binding TemperatureF}" />
+          <DataGridTextColumn Header="Summary" Binding="{Binding Summary}" />
+        </DataGrid.Columns>
+      </DataGrid>
+    </Panel>
+  </Grid>
+</UserControl>

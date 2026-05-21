@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Dao.Aspire.Avalonia.AppHost\Dao.Aspire.Avalonia.AppHost.csproj" />
+  <Project Path="Dao.Aspire.Avalonia.Desktop\Dao.Aspire.Avalonia.Desktop.csproj" />
+  <Project Path="Dao.Aspire.Avalonia.Api\Dao.Aspire.Avalonia.Api.csproj" />
+  <Project Path="Dao.Aspire.Avalonia.ServiceDefaults\Dao.Aspire.Avalonia.ServiceDefaults.csproj" />
+  <Project Path="Dao.Aspire.Avalonia.Shared\Dao.Aspire.Avalonia.Shared.csproj" />
+</Solution>
